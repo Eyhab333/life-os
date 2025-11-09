@@ -23,7 +23,8 @@ export default function DashboardSection({
           {/* هنا هنحط زر القلم بعدين */}
           <button
             onClick={() => setOpen((p) => !p)}
-            className="text-sm text-gray-500 hover:text-gray-700"
+            className="text-sm text-gray-500 hover:text-gray-700 cursor-pointer transition"
+           
           >
             {open ? "إخفاء" : "عرض"}
           </button>
