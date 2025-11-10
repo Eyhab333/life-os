@@ -13,6 +13,7 @@ import {
 } from "firebase/firestore";
 import { db } from "../firebase/config";
 import { useAuth } from "../context/AuthContext";
+import Link from "next/link";
 
 interface LifeArea {
   id: string;
@@ -93,14 +94,17 @@ export default function LifeFlames() {
   if (!areas.length) return <p className="text-center mt-10">🚫 لا توجد بيانات بعد</p>;
 
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-bold mb-4 text-center">🔥 شعلات حياتي</h2>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-        {areas.map((area) => {
-          const isHigh = area.intensity >= 0.8;
-          return (
+  <div className="p-6">
+    <h2 className="text-2xl font-bold mb-4 text-center font-[Tajawal]">🔥 شعلات حياتي</h2>
+
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+      {areas.map((area) => {
+        const isHigh = area.intensity >= 0.8;
+        const encodedName = encodeURIComponent(area.name);
+
+        return (
+          <Link key={area.id} href={`/life/${encodedName}`} className="group">
             <motion.div
-              key={area.id}
               className={`rounded-xl shadow p-4 text-center cursor-pointer bg-gradient-to-br ${getFlameColor(
                 area.intensity
               )} text-white`}
@@ -117,9 +121,12 @@ export default function LifeFlames() {
               }
               transition={isHigh ? { duration: 2, repeat: Infinity, ease: "easeInOut" } : {}}
               whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.97 }}
             >
-              <p className="text-lg font-semibold">{area.name}</p>
+              <p className="text-lg font-semibold group-hover:text-yellow-200 transition">{area.name}</p>
               <div className="mt-2 text-sm">🔥 النشاط: {(area.intensity * 100).toFixed(0)}%</div>
+
+              {/* ✅ السلايدر ما زال قابل للتعديل مباشرة */}
               <input
                 type="range"
                 min="0"
@@ -129,9 +136,10 @@ export default function LifeFlames() {
                 className="w-full mt-3 accent-orange-500"
               />
             </motion.div>
-          );
-        })}
-      </div>
+          </Link>
+        );
+      })}
     </div>
-  );
+  </div>
+);
 }
