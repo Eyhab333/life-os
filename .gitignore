@@ -19,7 +19,8 @@
 
 # production
 /build
-/firebase
+firebase/config.ts
+
 
 # misc
 .DS_Store
