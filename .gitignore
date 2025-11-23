@@ -19,9 +19,7 @@
 
 # production
 /build
-
-# Ignore Firebase config file
-firebase/config.ts
+/firebase
 
 # misc
 .DS_Store
