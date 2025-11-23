@@ -126,7 +126,7 @@ export default function GoalsList({ area }: { area: string }) {
             </Link>
             <button
               onClick={() => deleteGoal(goal.id)}
-              className="absolute top-3 right-3 text-gray-400 hover:text-red-500 transition"
+              className="absolute top-3 left-3 text-gray-400 hover:text-red-500 transition"
             >
               <Trash2 className="w-4 h-4" />
             </button>
