@@ -10,7 +10,7 @@ export default function BottomNav() {
 
   const links = [
     { href: "/dashboard", icon: Home, label: "الرئيسية" },
-    { href: "/mood", icon: Heart, label: "مزاجي" },
+    { href: "/mood", icon: Heart, label: "فترات المزاج" },
     { href: "/life", icon: Map, label: "شعلاتي" },
     { href: "/settings", icon: Settings, label: "الإعدادات" },
   ];

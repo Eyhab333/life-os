@@ -33,21 +33,19 @@ export default function Dashboard() {
             </p>
           </DashboardSection>
 
+
+          <DashboardSection title="🌤️ فترات المزاج" defaultOpen={false}>
+            <p className="text-gray-500 text-sm">
+              فترات مثل توليفة الربيع أو الإجازة وما يقابلها من نظام حياة.
+            </p>
+          </DashboardSection>
+
           <DashboardSection title="🧘 جلسة اليوم" defaultOpen={false}>
             <p className="text-gray-500 text-sm">
               مكان لتوليفة اليوم من روتينك ومهامك وأهدافك الصغيرة.
             </p>
           </DashboardSection>
 
-          <DashboardSection title="🔗 تطبيقاتي" defaultOpen={false}>
-            <MyApps />
-          </DashboardSection>
-
-          <DashboardSection title="📅 خريطة العمر (90 سنة)" defaultOpen={false}>
-            <p className="text-gray-500 text-sm">
-              تصور بصري لحياتك من سنة ميلادك حتى التسعين.
-            </p>
-          </DashboardSection>
 
           <DashboardSection title="🕌 أيامي الخاصة (الجمعة / السبت)" defaultOpen={false}>
             <p className="text-gray-500 text-sm">
@@ -55,11 +53,22 @@ export default function Dashboard() {
             </p>
           </DashboardSection>
 
-          <DashboardSection title="🌤️ فترات المزاج" defaultOpen={false}>
+
+
+
+
+
+          <DashboardSection title="📅 خريطة العمر (90 سنة)" defaultOpen={false}>
             <p className="text-gray-500 text-sm">
-              فترات مثل توليفة الربيع أو الإجازة وما يقابلها من نظام حياة.
+              تصور بصري لحياتك من سنة ميلادك حتى التسعين.
             </p>
           </DashboardSection>
+
+
+          <DashboardSection title="🔗 تطبيقاتي" defaultOpen={false}>
+            <MyApps />
+          </DashboardSection>
+
         </main>
       </div>
     </ProtectedPage>

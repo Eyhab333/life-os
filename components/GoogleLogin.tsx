@@ -18,19 +18,19 @@ export default function GoogleLogin() {
   }, []);
 
   const router = useRouter();
-const handleLogin = async () => {
-  try {
-    const result = await signInWithPopup(auth, provider);
-    const currentUser = result.user;
-    setUser(currentUser);
-    await createUserIfNotExists(currentUser);
+  const handleLogin = async () => {
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const currentUser = result.user;
+      setUser(currentUser);
+      await createUserIfNotExists(currentUser);
 
-    // ✅ تحويل تلقائي بعد تسجيل الدخول
-    router.push("/dashboard");
-  } catch (error) {
-    console.error("❌ Login error:", error);
-  }
-};
+      // ✅ تحويل تلقائي بعد تسجيل الدخول
+      router.push("/dashboard");
+    } catch (error) {
+      console.error("❌ Login error:", error);
+    }
+  };
 
   const handleLogout = async () => {
     try {

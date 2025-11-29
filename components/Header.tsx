@@ -17,7 +17,7 @@ export default function Header() {
               Life OS
             </Link>
             <p className="text-gray-600 text-sm mt-1">
-              👋 أهلاً {user?.displayName?.split(" ")[0] || "بك"}، استعد ليوم جديد من الوعي والنظام.
+              👋 أهلاً {user?.displayName?.split(" ")[0] || "بك"}    
             </p>
           </div>
 

@@ -1,80 +1,45 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useAuth } from "../../context/AuthContext";
-import { db } from "../../firebase/config";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
 import ProtectedPage from "../../components/ProtectedPage";
+import { useAuth } from "../../context/AuthContext";
 
 export default function SettingsPage() {
-  const { user } = useAuth();
-  const [theme, setTheme] = useState("light");
-  const [locale, setLocale] = useState("ar");
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchSettings = async () => {
-      if (!user) return;
-      const ref = doc(db, "users", user.uid);
-      const snap = await getDoc(ref);
-      if (snap.exists()) {
-        const data = snap.data();
-        setTheme(data.theme || "light");
-        setLocale(data.locale || "ar");
-      }
-      setLoading(false);
-    };
-    fetchSettings();
-  }, [user]);
-
-  const saveSettings = async () => {
-    if (!user) return;
-    const ref = doc(db, "users", user.uid);
-    await updateDoc(ref, { theme, locale });
-    alert("✅ تم حفظ الإعدادات بنجاح!");
-  };
-
-  if (loading) return <p className="text-center mt-10">⏳ جاري تحميل الإعدادات...</p>;
+  const { user, logout } = useAuth();
 
   return (
     <ProtectedPage>
       <div className="min-h-screen bg-gray-50 font-[Tajawal] text-gray-800">
-        <div className="max-w-xl mx-auto bg-white shadow-md rounded-2xl p-8 mt-10">
-          <h1 className="text-2xl font-bold mb-6 text-center">⚙️ إعدادات المستخدم</h1>
+        <main className="max-w-xl mx-auto px-4 pt-8 pb-20 space-y-6">
+          <h1 className="text-2xl font-bold text-orange-600 mb-2">
+            ⚙️ الإعدادات
+          </h1>
 
-          {/* إعداد الثيم */}
-          <div className="mb-6">
-            <label className="block mb-2 font-semibold text-gray-700">المظهر</label>
-            <select
-              value={theme}
-              onChange={(e) => setTheme(e.target.value)}
-              className="w-full border rounded-lg p-3 focus:outline-none focus:ring focus:ring-orange-300"
+          <section className="bg-white rounded-2xl shadow p-4 border">
+            <h2 className="font-semibold mb-3 text-gray-800">حسابي</h2>
+            <p className="text-sm text-gray-700">
+              الاسم:{" "}
+              <span className="font-medium">
+                {user?.displayName || "بدون اسم"}
+              </span>
+            </p>
+            <p className="text-sm text-gray-700 mt-1">
+              البريد:{" "}
+              <span className="font-mono text-xs">{user?.email}</span>
+            </p>
+          </section>
+
+          <section className="bg-white rounded-2xl shadow p-4 border">
+            <h2 className="font-semibold mb-3 text-gray-800">الجلسة</h2>
+            <button
+              onClick={logout}
+              className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl text-sm font-medium shadow"
             >
-              <option value="light">☀️ فاتح</option>
-              <option value="dark">🌙 داكن</option>
-            </select>
-          </div>
+              تسجيل الخروج
+            </button>
+          </section>
 
-          {/* إعداد اللغة */}
-          <div className="mb-6">
-            <label className="block mb-2 font-semibold text-gray-700">اللغة</label>
-            <select
-              value={locale}
-              onChange={(e) => setLocale(e.target.value)}
-              className="w-full border rounded-lg p-3 focus:outline-none focus:ring focus:ring-orange-300"
-            >
-              <option value="ar">🇸🇦 العربية</option>
-              <option value="en">🇺🇸 English</option>
-            </select>
-          </div>
-
-          <button
-            onClick={saveSettings}
-            className="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-xl font-semibold shadow"
-          >
-            حفظ التغييرات
-          </button>
-        </div>
+          {/* تقدر بعدين تضيف إعدادات الثيم / اللغة / إشعارات هنا */}
+        </main>
       </div>
     </ProtectedPage>
   );
