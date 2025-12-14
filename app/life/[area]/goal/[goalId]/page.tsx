@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useAuth } from "../../../../../context/AuthContext";
 import { db } from "../../../../../firebase/config";
@@ -12,9 +13,8 @@ import {
   updateDoc,
   serverTimestamp,
 } from "firebase/firestore";
-import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { CheckCircle2, Clock, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { formatDate } from "@/app/lib/helpers";
 
 interface Step {
@@ -26,8 +26,11 @@ interface Step {
   endDate?: any;
 }
 
-export default function RoadmapPage() {
-  const { area, goalId } = useParams();
+export default function GoalRoadmapPage() {
+  const params = useParams();
+  const area = decodeURIComponent(params.area as string);
+  const goalId = params.goalId as string;
+
   const { user } = useAuth();
   const [goalTitle, setGoalTitle] = useState("");
   const [steps, setSteps] = useState<Step[]>([]);
@@ -39,25 +42,42 @@ export default function RoadmapPage() {
     const fetchGoalData = async () => {
       if (!user || !area || !goalId) return;
 
-      const goalRef = doc(db, `users/${user.uid}/life_areas/${area}/goals/${goalId}`);
+      const goalRef = doc(
+        db,
+        `users/${user.uid}/life_areas/${area}/goals/${goalId}`
+      );
       const goalSnap = await getDoc(goalRef);
       if (goalSnap.exists()) setGoalTitle(goalSnap.data().title);
 
-      const roadmapRef = collection(db, `users/${user.uid}/life_areas/${area}/goals/${goalId}/roadmap`);
+      const roadmapRef = collection(
+        db,
+        `users/${user.uid}/life_areas/${area}/goals/${goalId}/roadmap`
+      );
       const snapshot = await getDocs(roadmapRef);
       const data: Step[] = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       })) as Step[];
-      setSteps(data.sort((a, b) => (a.startDate?.seconds || 0) - (b.startDate?.seconds || 0)));
+
+      setSteps(
+        data.sort(
+          (a, b) => (a.startDate?.seconds || 0) - (b.startDate?.seconds || 0)
+        )
+      );
     };
+
     fetchGoalData();
   }, [user, area, goalId]);
 
   // ➕ إضافة مرحلة جديدة
   const addStep = async () => {
     if (!user || !newStep.trim()) return;
-    const colRef = collection(db, `users/${user.uid}/life_areas/${area}/goals/${goalId}/roadmap`);
+
+    const colRef = collection(
+      db,
+      `users/${user.uid}/life_areas/${area}/goals/${goalId}/roadmap`
+    );
+
     const docRef = await addDoc(colRef, {
       title: newStep,
       description: newDesc,
@@ -66,10 +86,18 @@ export default function RoadmapPage() {
       endDate: null,
       createdAt: serverTimestamp(),
     });
+
     setSteps((prev) => [
       ...prev,
-      { id: docRef.id, title: newStep, description: newDesc, done: false, startDate: new Date() },
+      {
+        id: docRef.id,
+        title: newStep,
+        description: newDesc,
+        done: false,
+        startDate: new Date(),
+      },
     ]);
+
     setNewStep("");
     setNewDesc("");
   };
@@ -77,25 +105,44 @@ export default function RoadmapPage() {
   // ✅ تبديل حالة المرحلة
   const toggleDone = async (id: string, current: boolean) => {
     if (!user) return;
-    const stepRef = doc(db, `users/${user.uid}/life_areas/${area}/goals/${goalId}/roadmap/${id}`);
+
+    const stepRef = doc(
+      db,
+      `users/${user.uid}/life_areas/${area}/goals/${goalId}/roadmap/${id}`
+    );
+
     const updatedFields = current
       ? { done: false, endDate: null }
       : { done: true, endDate: serverTimestamp() };
+
     await updateDoc(stepRef, updatedFields);
+
     setSteps((prev) =>
       prev.map((s) =>
-        s.id === id ? { ...s, ...updatedFields, endDate: current ? null : new Date() } : s
+        s.id === id
+          ? { ...s, ...updatedFields, endDate: current ? null : new Date() }
+          : s
       )
     );
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-orange-50 to-white px-6 py-10 font-[Tajawal]">
-      <h1 className="text-3xl font-bold text-orange-600 mb-2">🗺️ خارطة الطريق</h1>
-      <p className="text-gray-600 mb-8">الهدف: <span className="font-semibold">{goalTitle}</span></p>
+    <section className="space-y-6">
+      {/* 🧭 الهيدر الصغير لصفحة خارطة الطريق */}
+      <div className="rounded-2xl border bg-white p-5 shadow-sm">
+        <h1 className="mb-2 text-2xl font-bold text-orange-600">
+          🗺️ خارطة الطريق
+        </h1>
+        <p className="text-sm text-gray-600">
+          الهدف في هذا المجال:{" "}
+          <span className="font-semibold">
+            {goalTitle || "هدف بدون عنوان"}
+          </span>
+        </p>
+      </div>
 
       {/* 🆕 إضافة مرحلة جديدة */}
-      <div className="bg-white p-5 rounded-2xl shadow mb-10">
+      <div className="bg-white p-5 rounded-2xl shadow-sm border">
         <h3 className="font-bold text-gray-800 mb-3">➕ أضف مرحلة جديدة</h3>
         <input
           type="text"
@@ -113,15 +160,15 @@ export default function RoadmapPage() {
         />
         <button
           onClick={addStep}
-          className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-xl flex items-center gap-2"
+          className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-xl flex items-center gap-2 text-sm"
         >
           <Plus className="w-4 h-4" /> إضافة مرحلة
         </button>
       </div>
 
       {/* 🌈 Timeline الأفقي */}
-      <div className="overflow-x-auto pb-10">
-        <div className="relative flex items-center gap-12 min-w-max px-4">
+      <div className="bg-white p-5 rounded-2xl shadow-sm border overflow-x-auto">
+        <div className="relative flex items-center gap-12 min-w-max px-4 pb-4">
           {/* الخط المتصل */}
           <div className="absolute top-8 left-0 right-0 h-1 bg-gradient-to-r from-orange-400 via-yellow-400 to-green-400 rounded-full" />
 
@@ -131,7 +178,7 @@ export default function RoadmapPage() {
               className="relative flex flex-col items-center w-56 min-w-[14rem]"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
+              transition={{ delay: index * 0.08 }}
             >
               {/* 🔘 النقطة */}
               <div
@@ -140,7 +187,7 @@ export default function RoadmapPage() {
                     ? "bg-green-500 border-green-200 shadow-lg shadow-green-300"
                     : "bg-orange-400 border-orange-200 shadow-md"
                 }`}
-              ></div>
+              />
 
               {/* 📦 الكارت */}
               <motion.div
@@ -164,7 +211,6 @@ export default function RoadmapPage() {
                 <div className="text-xs text-gray-500 space-y-1 mb-3">
                   <p>📅 البداية: {formatDate(step.startDate)}</p>
                   <p>⏳ الإتمام: {formatDate(step.endDate)}</p>
-
                 </div>
 
                 {/* الزر */}
@@ -183,6 +229,6 @@ export default function RoadmapPage() {
           ))}
         </div>
       </div>
-    </div>
+    </section>
   );
 }
